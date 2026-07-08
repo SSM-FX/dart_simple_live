@@ -1,0 +1,62 @@
+name: preview-android-arm64
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/miui-style-preview
+
+jobs:
+  build-android-arm64:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Android keystore
+        id: android_keystore
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: keystore.jks
+          encodedString: ${{ secrets.KEYSTORE_BASE64 }}
+
+      - name: Create key.properties
+        run: |
+          echo "${{ secrets.FIREBASE_JSON }}" | base64 --decode > simple_live_app/android/app/google-services.json
+          echo "${{ secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > simple_live_app/lib/firebase_options.dart
+          echo "storeFile=${{ steps.android_keystore.outputs.filePath }}" > simple_live_app/android/key.properties
+          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> simple_live_app/android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> simple_live_app/android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> simple_live_app/android/key.properties
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '17'
+          cache: gradle
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: simple_live_app/pubspec.yaml
+          cache: true
+
+      - name: Restore packages
+        run: |
+          cd simple_live_app
+          flutter pub get
+
+      - name: Build APK arm64-v8a
+        run: |
+          cd simple_live_app
+          flutter build apk --release --target-platform android-arm64
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-arm64-v8a
+          path: simple_live_app/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
