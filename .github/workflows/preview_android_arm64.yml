@@ -2,9 +2,6 @@ name: preview-android-arm64
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feat/miui-style-preview
 
 jobs:
   build-android-arm64:
