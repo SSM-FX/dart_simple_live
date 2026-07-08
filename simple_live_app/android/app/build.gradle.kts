@@ -79,6 +79,7 @@ flutter {
     source = "../.."
 }
 
-firebaseCrashlytics {
-    mappingFileUploadEnabled = !isPreviewBuild
-}
+tasks.matching { it.name.contains("uploadCrashlyticsMappingFile", ignoreCase = true) }
+    .configureEach {
+        enabled = !isPreviewBuild
+    }
