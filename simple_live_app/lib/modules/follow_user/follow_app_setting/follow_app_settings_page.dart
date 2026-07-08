@@ -9,6 +9,7 @@ import 'package:simple_live_app/widgets/settings/settings_action.dart';
 import 'package:simple_live_app/widgets/settings/settings_card.dart';
 import 'package:simple_live_app/widgets/settings/settings_menu_check.dart';
 import 'package:simple_live_app/widgets/settings/settings_number.dart';
+import 'package:simple_live_app/widgets/miui/miui_glass.dart';
 import 'package:simple_live_app/widgets/settings/settings_switch.dart';
 
 class FollowSettingsPage extends GetView<FollowAppSettingsController> {
@@ -17,11 +18,10 @@ class FollowSettingsPage extends GetView<FollowAppSettingsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("关注设置"),
-      ),
+      extendBodyBehindAppBar: true,
+      appBar: const MiuiGlassTitleBar(title: '关注设置'),
       body: ListView(
-        padding: AppStyle.edgeInsetsA12,
+        padding: AppStyle.edgeInsetsA12.copyWith(top: 90),
         children: [
           Column(
             mainAxisSize: MainAxisSize.min,

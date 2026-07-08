@@ -106,13 +106,13 @@ class MiuiGlassTopBar extends StatelessWidget implements PreferredSizeWidget {
   const MiuiGlassTopBar({
     required this.child,
     super.key,
-    this.height = 58,
-    this.margin = const EdgeInsets.fromLTRB(12, 8, 12, 8),
+    this.height = 56,
+    this.margin = const EdgeInsets.fromLTRB(12, 2, 12, 6),
     this.padding = const EdgeInsets.symmetric(horizontal: 8),
   });
 
   @override
-  Size get preferredSize => Size.fromHeight(height + 16);
+  Size get preferredSize => Size.fromHeight(height + 8);
 
   @override
   Widget build(BuildContext context) {
@@ -121,16 +121,79 @@ class MiuiGlassTopBar extends StatelessWidget implements PreferredSizeWidget {
       child: SafeArea(
         bottom: false,
         child: SizedBox(
-          height: height + 16,
+          height: height + 8,
           child: MiuiGlass(
             margin: margin,
             padding: padding,
             radius: 28,
             blur: 26,
-            opacity: Theme.of(context).brightness == Brightness.dark ? 0.56 : 0.66,
+            opacity: Theme.of(context).brightness == Brightness.dark ? 0.54 : 0.64,
             child: Center(child: child),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class MiuiGlassTitleBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final List<Widget> actions;
+  final bool automaticallyImplyLeading;
+  final VoidCallback? onBack;
+  final Widget? leading;
+  final double height;
+
+  const MiuiGlassTitleBar({
+    required this.title,
+    super.key,
+    this.actions = const [],
+    this.automaticallyImplyLeading = true,
+    this.onBack,
+    this.leading,
+    this.height = 56,
+  });
+
+  @override
+  Size get preferredSize => Size.fromHeight(height + 8);
+
+  @override
+  Widget build(BuildContext context) {
+    final canBack = Navigator.of(context).canPop() || (Get.key.currentState?.canPop() ?? false);
+    final showLeading = leading != null || (automaticallyImplyLeading && canBack);
+    return MiuiGlassTopBar(
+      height: height,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 44,
+            child: showLeading
+                ? (leading ??
+                    IconButton(
+                      onPressed: onBack ?? () => Get.back(),
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                    ))
+                : null,
+          ),
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ),
+          SizedBox(
+            width: actions.isEmpty ? 44 : null,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: actions,
+            ),
+          ),
+        ],
       ),
     );
   }
