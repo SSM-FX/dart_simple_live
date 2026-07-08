@@ -86,7 +86,7 @@ jobs:
         run: |
           keytool -genkeypair \
             -v \
-            -keystore simple_live_app/android/app/preview-release.jks \
+            -keystore simple_live_app/android/preview-release.jks \
             -storepass preview123 \
             -keypass preview123 \
             -alias preview \
