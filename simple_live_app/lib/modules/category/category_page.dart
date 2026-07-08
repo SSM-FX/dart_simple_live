@@ -4,6 +4,7 @@ import 'package:simple_live_app/app/app_style.dart';
 import 'package:simple_live_app/app/sites.dart';
 import 'package:simple_live_app/modules/category/category_controller.dart';
 import 'package:simple_live_app/modules/category/category_list_view.dart';
+import 'package:simple_live_app/widgets/miui/miui_glass.dart';
 
 class CategoryPage extends GetView<CategoryController> {
   const CategoryPage({super.key});
@@ -11,9 +12,10 @@ class CategoryPage extends GetView<CategoryController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 12,
-        title: TabBar(
+      extendBodyBehindAppBar: true,
+      appBar: MiuiGlassTopBar(
+        height: 54,
+        child: TabBar(
           controller: controller.tabController,
           padding: EdgeInsets.zero,
           labelPadding: const EdgeInsets.symmetric(horizontal: 8),
@@ -21,7 +23,7 @@ class CategoryPage extends GetView<CategoryController> {
           tabs: Sites.supportSites
               .map(
                 (e) => Tab(
-                  height: 40,
+                  height: 38,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

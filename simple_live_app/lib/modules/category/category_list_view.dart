@@ -28,7 +28,7 @@ class CategoryListView extends StatelessWidget {
             completeDuration: const Duration(milliseconds: 400),
           ),
           child: ListView.builder(
-            padding: AppStyle.edgeInsetsA12,
+            padding: AppStyle.edgeInsetsA12.copyWith(top: 96),
             itemCount: controller.list.length,
             controller: controller.scrollController,
             itemBuilder: (_, i) {

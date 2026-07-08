@@ -20,7 +20,7 @@ class HomeListView extends StatelessWidget {
     return KeepAliveWrapper(
       child: PageGridView(
         pageController: controller,
-        padding: AppStyle.edgeInsetsA12,
+        padding: AppStyle.edgeInsetsA12.copyWith(top: 96),
         firstRefresh: true,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
