@@ -15,22 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Android keystore
-        id: android_keystore
-        uses: timheuer/base64-to-file@v1.2
-        with:
-          fileName: keystore.jks
-          encodedString: ${{ secrets.KEYSTORE_BASE64 }}
-
-      - name: Create key.properties
-        run: |
-          echo "${{ secrets.FIREBASE_JSON }}" | base64 --decode > simple_live_app/android/app/google-services.json
-          echo "${{ secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > simple_live_app/lib/firebase_options.dart
-          echo "storeFile=${{ steps.android_keystore.outputs.filePath }}" > simple_live_app/android/key.properties
-          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> simple_live_app/android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> simple_live_app/android/key.properties
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> simple_live_app/android/key.properties
-
       - uses: actions/setup-java@v4
         with:
           distribution: zulu
@@ -44,19 +28,76 @@ jobs:
           flutter-version-file: simple_live_app/pubspec.yaml
           cache: true
 
+      - name: Create preview firebase files
+        run: |
+          cat > simple_live_app/android/app/google-services.json <<'EOF'
+          {
+            "project_info": {
+              "project_number": "1234567890",
+              "project_id": "slive-preview",
+              "storage_bucket": "slive-preview.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:1234567890:android:preview123456",
+                  "android_client_info": {
+                    "package_name": "com.slotsun.slive"
+                  }
+                },
+                "api_key": [
+                  {
+                    "current_key": "preview-key"
+                  }
+                ]
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+          cat > simple_live_app/lib/firebase_options.dart <<'EOF'
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+          import 'package:flutter/foundation.dart'
+              show defaultTargetPlatform, kIsWeb, TargetPlatform;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform {
+              if (kIsWeb) {
+                throw UnsupportedError('DefaultFirebaseOptions are not configured for web in preview build.');
+              }
+              switch (defaultTargetPlatform) {
+                case TargetPlatform.android:
+                  return android;
+                default:
+                  throw UnsupportedError(
+                    'DefaultFirebaseOptions are not supported for this platform in preview build.',
+                  );
+              }
+            }
+
+            static const FirebaseOptions android = FirebaseOptions(
+              apiKey: 'preview-key',
+              appId: '1:1234567890:android:preview123456',
+              messagingSenderId: '1234567890',
+              projectId: 'slive-preview',
+              storageBucket: 'slive-preview.appspot.com',
+            );
+          }
+          EOF
+
       - name: Restore packages
         run: |
           cd simple_live_app
           flutter pub get
 
-      - name: Build APK arm64-v8a
+      - name: Build APK arm64-v8a debug
         run: |
           cd simple_live_app
-          flutter build apk --release --target-platform android-arm64
+          flutter build apk --debug --target-platform android-arm64
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-arm64-v8a
-          path: simple_live_app/build/app/outputs/flutter-apk/app-release.apk
+          name: android-arm64-v8a-debug
+          path: simple_live_app/build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
