@@ -95,7 +95,7 @@ jobs:
             -validity 10000 \
             -dname "CN=Slive Preview, OU=Preview, O=SSM-FX, L=Preview, S=Preview, C=CN"
           cat > simple_live_app/android/key.properties <<'EOF'
-          storeFile=preview-release.jks
+          storeFile=../preview-release.jks
           storePassword=preview123
           keyPassword=preview123
           keyAlias=preview
