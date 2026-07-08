@@ -20,6 +20,7 @@ if (keystorePropertiesFile.exists()) {
 }
 val hasReleaseSigning = listOf("keyAlias", "keyPassword", "storeFile", "storePassword")
     .all { !keystoreProperties.getProperty(it).isNullOrBlank() }
+val isPreviewBuild = keystoreProperties.getProperty("keyAlias") == "preview"
 
 android {
     namespace = "com.slotsun.slive"
@@ -76,4 +77,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+firebaseCrashlytics {
+    mappingFileUploadEnabled = !isPreviewBuild
 }
